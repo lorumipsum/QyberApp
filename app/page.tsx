@@ -25,6 +25,18 @@ export default function App() {
     listTodos();
   }, []);
 
+  // Handle Cognito authorization code
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code");
+    
+    if (code) {
+      console.log("Got Cognito auth code:", code);
+      // Clear the URL parameters so they don't show in the address bar
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   function createTodo() {
     client.models.Todo.create({
       content: window.prompt("Todo content"),
@@ -42,11 +54,13 @@ export default function App() {
       </ul>
       <div>
         🥳 App successfully hosted. Try creating a new todo.
-        <br />
+          
+
         <a href="https://docs.amplify.aws/nextjs/start/quickstart/nextjs-app-router-client-components/">
           Review next steps of this tutorial.
         </a>
       </div>
     </main>
-  );
+   );
 }
+
