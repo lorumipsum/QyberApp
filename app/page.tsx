@@ -23,12 +23,6 @@ export default function App() {
 
   useEffect(() => {
     listTodos();
-    
-    // Handle auth code
-    const code = new URLSearchParams(window.location.search).get("code");
-    if (code) {
-      console.log("Auth code:", code);
-    }
   }, []);
 
   function createTodo() {
