@@ -23,17 +23,11 @@ export default function App() {
 
   useEffect(() => {
     listTodos();
-  }, []);
-
-  // Handle Cognito authorization code
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get("code");
     
+    // Handle auth code
+    const code = new URLSearchParams(window.location.search).get("code");
     if (code) {
-      console.log("Got Cognito auth code:", code);
-      // Clear the URL parameters so they don't show in the address bar
-      window.history.replaceState({}, document.title, window.location.pathname);
+      console.log("Auth code:", code);
     }
   }, []);
 
@@ -63,4 +57,3 @@ export default function App() {
     </main>
    );
 }
-
