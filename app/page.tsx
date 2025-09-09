@@ -1,22 +1,64 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { generateClient } from "aws-amplify/data";
+import type { Schema } from "@/amplify/data/resource";
+import "./../app/app.css";
+import { Amplify } from "aws-amplify";
+import outputs from "@/amplify_outputs.json";
+import "@aws-amplify/ui-react/styles.css";
+
+Amplify.configure(outputs);
+
+const client = generateClient<Schema>();
+
 export default function App() {
+  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+
+  function listTodos() {
+    client.models.Todo.observeQuery().subscribe({
+      next: (data) => setTodos([...data.items]),
+    });
+  }
+
+  useEffect(() => {
+    listTodos();
+  }, []);
+
+  // Handle Cognito authorization code
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code");
+    
+    if (code) {
+      console.log("✅ Received Cognito authorization code:", code);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
+  function createTodo() {
+    client.models.Todo.create({
+      content: window.prompt("Todo content"),
+    });
+  }
+
   return (
     <main>
-      <h1>Test Page</h1>
-      <p>If you see this, the app is working</p>
+      <h1>My todos</h1>
+      <button onClick={createTodo}>+ new</button>
+      <ul>
+        {todos.map((todo) => (
+          <li key={todo.id}>{todo.content}</li>
+        ))}
+      </ul>
+      <div>
+        🥳 App successfully hosted. Try creating a new todo.
+          
+
+        <a href="https://docs.amplify.aws/nextjs/start/quickstart/nextjs-app-router-client-components/">
+          Review next steps of this tutorial.
+        </a>
+      </div>
     </main>
-  );
+   );
 }
-// Handle Cognito authorization code
-useEffect(() => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const code = urlParams.get("code");
-  
-  if (code) {
-    console.log("✅ Received Cognito authorization code:", code);
-    // Clean up the URL so the code doesn't show in the address bar
-    window.history.replaceState({}, document.title, window.location.pathname);
-    
-    // Here you can exchange the code for tokens or mark user as authenticated
-    // For now, just log it to confirm it's working
-  }
-}, []);
